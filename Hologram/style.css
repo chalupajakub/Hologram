@@ -331,6 +331,68 @@ nav a:hover{
     right: 20px;
 }
 
+.profile img{
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+    margin-inline: auto;
+    border-radius: 50%;
+}
+
+.profile #name{
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 0;
+    font-weight: 600;
+}
+
+.profile #username{
+    text-align: center;
+    font-size: 1rem;
+    margin-top: 0;
+    opacity: 0.8;
+}
+
+#bio{
+    margin: 40px 20px;
+    font-weight: 300;
+    background: rgb(59, 59, 59);
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.settings{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    height: 50px;
+}
+
+.settings a{
+    height: 20px;
+    padding: 10px 20px;
+    border-radius: 20px;
+}
+
+.settings a:hover{
+    background: rgb(59, 59, 59);
+}
+
+#upload{
+    background: linear-gradient(20deg, rgb(0, 153, 255), rgb(0, 193, 219));
+    padding: 20px 10px;
+    font-weight: 500;
+    border-radius: 20px;
+    text-align: center;
+    display: block;
+    width: 120px;
+    margin-inline: auto;
+}
+
 .side-panel h3{
     font-weight: 400;
     text-align: center;
