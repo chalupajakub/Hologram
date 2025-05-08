@@ -177,6 +177,7 @@ input[type="submit"]{
     border: none;
     font-size: 1rem;
     cursor: pointer;
+    background: linear-gradient(20deg, rgb(0, 153, 255), rgb(0, 193, 219));
 }
 
 form label{
@@ -405,4 +406,11 @@ nav a:hover{
 
 .panel img{
     filter: invert();
+}
+
+textarea{
+    background: rgb(30, 30, 30);
+    width: 100%;
+    resize: none;
+    color: white;
 }
