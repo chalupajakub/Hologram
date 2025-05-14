@@ -27,9 +27,16 @@
 include 'connect.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $jmeno = mysqli_real_escape_string($conn, $_POST["username"]);
+    $jmeno = $_POST["username"];
     $email = mysqli_real_escape_string($conn, $_POST["email"]);
     $heslo = password_hash($_POST["password"], PASSWORD_DEFAULT);
+
+    if (!preg_match('/^[a-z0-9._]+$/', $jmeno)) {
+        echo "<p style='text-align: center; color: red;'>Uživatelské jméno může obsahovat pouze malá písmena, čísla, tečky a podtržítka.</p>";
+        exit;
+    }
+
+    $jmeno = mysqli_real_escape_string($conn, $jmeno);
 
     $kontrola = "SELECT id FROM users WHERE username = '$jmeno'";
     $vysledek = mysqli_query($conn, $kontrola);
@@ -42,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (mysqli_query($conn, $sql)) {
             echo "<p style='text-align: center'>Registrace byla úspěšná.</p>";
         } else {
-            echo "<p style='text-align: center'>Chyba: " . mysqli_error($conn). "</p>";
+            echo "<p style='text-align: center'>Chyba: " . mysqli_error($conn) . "</p>";
         }
     }
 }
