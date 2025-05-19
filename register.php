@@ -44,7 +44,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (mysqli_num_rows($vysledek) > 0) {
         echo "<p style='text-align: center'>Uživatelské jméno '$jmeno' je již zabrané. Zvolte prosím jiné.</p>";
     } else {
-        $sql = "INSERT INTO users (username, email, password, name) VALUES ('$jmeno', '$email', '$heslo', '$jmeno')";
+        $defaultpfp = "uploads/pfp.jpg";
+        $sql = "INSERT INTO users (username, email, password, name, pfp) VALUES ('$jmeno', '$email', '$heslo', '$jmeno','$defaultpfp')";
         
         if (mysqli_query($conn, $sql)) {
             echo "<p style='text-align: center'>Registrace byla úspěšná.</p>";
