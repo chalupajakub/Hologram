@@ -19,10 +19,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $name = $_POST['name'];
     $bio = $_POST['bio'];
+    
+    $kontrola = "SELECT id FROM users WHERE username = '$username'";
+    $vysledek = mysqli_query($conn, $kontrola);
+    $vysl = $vysledek->fetch_assoc();
+    
+    
 
-    if (!empty($_FILES['pfp']['name'])) {
+    if (mysqli_num_rows($vysledek) > 0 && $_SESSION['user_id'] != $vysl['id']) {
+        echo "<p style='text-align: center'>Uživatelské jméno '$jmeno' je již zabrané. Zvolte prosím jiné.</p>";
+    }
+    else{
+        if (!empty($_FILES['pfp']['name'])) {
         $target_dir = "uploads/";
-        $target_file = $target_dir . basename($_FILES["pfp"]["name"]);
+        $target_file = $target_dir . $_SESSION['username']. "_pfp.jpg";
 
         if (move_uploaded_file($_FILES["pfp"]["tmp_name"], $target_file)) {
             $pfp_path = $target_file;
@@ -39,8 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
 
     echo "Profil byl aktualizován.";
-    header("Refresh:0");
+    
+    header("Location: index.php");
     exit;
+    }
 }
 ?>
 
@@ -59,19 +71,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Upravit profil</h2>
     <form method="POST" enctype="multipart/form-data">
         <label>Username:</label><br>
-        <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>"><br><br>
+        <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>">
 
         <label>Jméno:</label><br>
-        <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>"><br><br>
+        <input type="text" name="name" value="<?= htmlspecialchars($user['name']) ?>">
 
-        <label>Profilový obrázek:</label><br>
+        <label>Profilový obrázek:</label>
         <?php if ($user['pfp']): ?>
             <img src="<?= htmlspecialchars($user['pfp']) ?>" alt="pfp" width="100"><br>
         <?php endif; ?>
-        <input type="file" name="pfp"><br><br>
+        <input type="file" name="pfp">
 
         <label>Bio:</label><br>
-        <textarea name="bio" rows="5" cols="40"><?= htmlspecialchars($user['bio']) ?></textarea><br><br>
+        <textarea name="bio" rows="5" cols="40"><?= htmlspecialchars($user['bio']) ?></textarea>
 
         <button type="submit">Uložit změny</button>
     </form>
