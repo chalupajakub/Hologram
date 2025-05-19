@@ -9,6 +9,7 @@
     }
     
     $id = $_SESSION['user_id'];
+    $username = $_SESSION['username'];
     
     $stmt = $conn->prepare
     ("SELECT 
@@ -48,7 +49,7 @@
             <div>
                 <a href="#" id="checked">Home</a>
                 <a href="post.php">Post</a>
-                <a href="profile.php?id=<?php echo $id?>">Profile</a>
+                <a href="profile.php?user=<?php echo $username?>">Profile</a>
                 <a href="#">Messages</a>
             </div>
         </nav>
@@ -71,7 +72,7 @@
                 <div class="post">
             <div class="header">
                 <img src="<?php echo htmlspecialchars($row['pfp']);?>" alt="pfp">
-                <a href="profile.php?id=<?php echo htmlspecialchars($row['id']);?>"><?php echo htmlspecialchars($row['username']);?></a>
+                <a href="profile.php?user=<?php echo htmlspecialchars($row['username']);?>"><?php echo htmlspecialchars($row['username']);?></a>
             </div>
             <div class="content">
                 <img src="<?php echo htmlspecialchars($row['image']); ?>" alt="post">
