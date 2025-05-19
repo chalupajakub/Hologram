@@ -2,21 +2,24 @@
     include 'connect.php';
     session_start();
     
-    if(empty($_SESSION['user_id'])){
+    if(empty($_SESSION['username'])){
         header("Location: login.php");
         exit;
     }
-
-    $id;
     
-    if(isset($_GET['id'])){
-        $id = intval($_GET['id']);
+    $username;
+    
+    if(isset($_GET['user'])){
+        $username = $_GET['user'];
     }
 
-    $userSql = $conn->query("SELECT * FROM users WHERE id = $id");
-    $user = $userSql->fetch_assoc();
+    $userstmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+    $userstmt->bind_param("s", $username);
+    $userstmt->execute();
+    $userResult = $userstmt->get_result();
+    $user = $userResult->fetch_assoc();
     
-    if (!isset($id) || !is_numeric($id) || empty($user['id'])) {
+    if (!isset($username) || empty($user['id'])) {
         die("Uzivatel neexistuje.");
     }
     
@@ -86,14 +89,14 @@
             <p>Sleduje: <?php echo $pocetSledovanych ?></p>
         </div>
         
-        <a href="follow.php?id=<?php echo $user['id']?>"><?php if($id != $_SESSION['user_id']){ echo 'Sledovat';}?></a>
+        <a href="follow.php?id=<?php echo $user['id']?>"><?php if($username != $_SESSION['username']){ echo 'Sledovat';}?></a>
       </div>
     </div>
 
     <div class="prispevky">
         <?php
             $stmt = $conn->prepare("SELECT * FROM posts WHERE user_id = ? ORDER BY date DESC");
-            $stmt->bind_param("i", $id);
+            $stmt->bind_param("i", $user['id']);
             $stmt->execute();
 
             $result = $stmt->get_result();
