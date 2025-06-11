@@ -42,6 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION["name"] = $uzivatel["name"];
             $_SESSION["pfp"] = $uzivatel["pfp"];
             $_SESSION["bio"] = $uzivatel["bio"];
+            $_SESSION["canPost"] = $uzivatel["canPost"];
             echo "<p style='text-align: center'>Přihlášení bylo úspěšné.</p>";
             header("Location: index.php");
         } else {
