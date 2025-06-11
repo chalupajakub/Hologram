@@ -1,3 +1,71 @@
+<?php
+include 'connect.php';
+
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = trim($_POST["username"]);
+    $email = trim($_POST["email"]);
+    $password = $_POST["password"];
+    $canPost = false;
+    
+
+    if (empty($username)) {
+        echo "Uživatelské jméno je povinné.";
+    } elseif (!preg_match('/^[a-z0-9._]+$/', $username)) {
+        echo "Uživatelské jméno může obsahovat pouze malá písmena, čísla, tečky a podtržítka.";
+    } elseif (strlen($username) < 3 || strlen($username) > 20) {
+        echo "Uživatelské jméno musí mít 3-20 znaků.";
+    }
+    
+
+    if (empty($email)) {
+        echo "Email je povinný.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        echo "Neplatný formát emailu.";
+    } elseif (strlen($email) > 100) {
+        echo "Email je příliš dlouhý.";
+    }
+
+    if (empty($password)) {
+        echo "Heslo je povinné.";
+    } elseif (strlen($password) < 8) {
+        echo "Heslo musí mít alespoň 8 znaků.";
+    }
+    
+        $check_stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $check_stmt->bind_param("s", $username);
+        $check_stmt->execute();
+        $check_result = $check_stmt->get_result();
+        
+        if ($check_result->num_rows > 0) {
+            echo "Uživatelské jméno '$username' je již zabrané. Zvolte prosím jiné.";
+        } else {
+            $email_check_stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $email_check_stmt->bind_param("s", $email);
+            $email_check_stmt->execute();
+            $email_check_result = $email_check_stmt->get_result();
+            
+            if ($email_check_result->num_rows > 0) {
+                echo "Tento email je již registrován.";
+            } else {
+                $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+                $defaultpfp = "uploads/pfp.jpg";
+                
+                $canPost = 0;
+                $insert_stmt = $conn->prepare("INSERT INTO users (username, email, password, name, pfp, canPost) VALUES (?, ?, ?, ?, ?, ?)");
+                $insert_stmt->bind_param("sssssi", $username, $email, $hashed_password, $username, $defaultpfp, $canPost);
+                
+                if ($insert_stmt->execute()) {
+                    $success = "Registrace byla úspěšná. Nyní se můžete přihlásit.";
+                    header("Refresh: 3; URL=login.php");
+                } else {
+                    echo "Chyba při registraci: " . $conn->error;
+                }
+            }
+        }
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,47 +79,20 @@
 </head>
 <body>
     <h2>Registrace</h2>
-
-    <form action="#" method="post">
-        <input type="text" name="username" placeholder="Uživatelské jméno" autocomplete="off">
-        <input type="password" name="password" placeholder="Heslo">
-        <input type="email" name="email" placeholder="Email" autocomplete="off">
-        <label>Registrací souhlasíte se <a href="https://www.youtube.com/watch?v=4HkO5P7gZuI" style="color: aqua">smluvními podmínkami</a></label>
-        <input type="submit" value="Zaregistrovat" class="btn-primary">
-    </form>
+    
+        <form action="#" method="post">
+            <input type="text" name="username" placeholder="Uživatelské jméno" autocomplete="off" 
+                   pattern="[a-z0-9._]+" title="Pouze malá písmena, čísla, tečky a podtržítka" required>
+            
+            <input type="password" name="password" placeholder="Heslo" minlength="8" required>
+            
+            <input type="email" name="email" placeholder="Email" autocomplete="off"
+                   maxlength="100" required>
+            
+            <label>Registrací souhlasíte se <a href="smluvnipodminky.html" style="color: aqua">smluvními podmínkami</a></label>
+            <input type="submit" value="Zaregistrovat" class="btn-primary">
+        </form>
+    
     <p style="text-align: center; opacity: 0.7"><a href="login.php">Již mám účet</a></p>
 </body>
 </html>
-
-<?php
-include 'connect.php';
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $jmeno = $_POST["username"];
-    $email = mysqli_real_escape_string($conn, $_POST["email"]);
-    $heslo = password_hash($_POST["password"], PASSWORD_DEFAULT);
-
-    if (!preg_match('/^[a-z0-9._]+$/', $jmeno)) {
-        echo "<p style='text-align: center; color: red;'>Uživatelské jméno může obsahovat pouze malá písmena, čísla, tečky a podtržítka.</p>";
-        exit;
-    }
-
-    $jmeno = mysqli_real_escape_string($conn, $jmeno);
-
-    $kontrola = "SELECT id FROM users WHERE username = '$jmeno'";
-    $vysledek = mysqli_query($conn, $kontrola);
-
-    if (mysqli_num_rows($vysledek) > 0) {
-        echo "<p style='text-align: center'>Uživatelské jméno '$jmeno' je již zabrané. Zvolte prosím jiné.</p>";
-    } else {
-        $defaultpfp = "uploads/pfp.jpg";
-        $sql = "INSERT INTO users (username, email, password, name, pfp) VALUES ('$jmeno', '$email', '$heslo', '$jmeno','$defaultpfp')";
-        
-        if (mysqli_query($conn, $sql)) {
-            echo "<p style='text-align: center'>Registrace byla úspěšná.</p>";
-        } else {
-            echo "<p style='text-align: center'>Chyba: " . mysqli_error($conn) . "</p>";
-        }
-    }
-}
-?>
